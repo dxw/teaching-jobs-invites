@@ -13,7 +13,7 @@ class CreateDfeSignInUser
       req.body = JSON.generate(sign_in_params)
     end
     if sign_in_response.success?
-      puts "Created invitation for #{@user[:email]}"
+      puts "Created invitation for #{@user[:email]} for #{@user[:school_urn]}"
       return true
     end
     raise InvitationFailed, sign_in_response.body
