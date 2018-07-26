@@ -8,21 +8,12 @@ class CreateInvite
     @user = user
     @jwt_token = jwt_token
     @sign_in_connection = Faraday.new(ENV['DFE_SIGN_IN_API_URL'])
-    @tva_connection = Faraday.new(ENV['TVA_URL'])
     @notify_client = Notifications::Client.new(ENV['NOTIFY_KEY'])
   end
 
   def call
     begin
-      tva_response = @tva_connection.post do |req|
-        req.url '/permissions'
-        req.headers['Authorization'] = "Token token=#{ENV['TVA_TOKEN']}"
-        req.headers['Content-Type'] = 'application/json'
-        req.body = JSON.generate({
-          user_token: @user[:email],
-          school_urn: @user[:school_urn]
-        })
-      end
+      tva_response = Preauthorise.new(@user).call
       unless tva_response.success?
         raise InvitationFailed, tva_response.body
       end
@@ -30,7 +21,8 @@ class CreateInvite
         email_address: @user[:email],
         template_id: ENV['NOTIFY_TEMPLATE_ID'],
         personalisation: {
-          first_name: @user[:given_name]
+          first_name: @user[:given_name],
+          school_name: @user[:school]
         },
         reference: "your_reference_string"
       )
