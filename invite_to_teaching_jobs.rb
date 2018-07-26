@@ -6,9 +6,7 @@ require 'jwt'
 require './create_invite'
 
 users = [
-  {email: 'robbie.paul+2@dxw.com', given_name: 'Robbie', family_name: 'Paul', school_urn: '137138'},
-  {email: 'robbie.paul+15@dxw.com', given_name: 'Robbie', family_name: 'Paul', school_urn: '137138'},
-  {email: 'robbie.paul+16@dxw.com', given_name: 'Robbie', family_name: 'Paul', school_urn: '137138'},
+  {email: 'tom.hipkin+45@digital.education.gov.uk', given_name: 'Tom', family_name: 'Hipkin', school_name: 'Macmillan Academy', school_urn: '137138'},
 ]
 
 results = users.map do |user|

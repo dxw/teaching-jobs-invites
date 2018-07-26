@@ -1,11 +1,11 @@
-class Preauthorise
+class Authorisation
   class InvitationFailed < RuntimeError; end
 
   def initialize(user)
     @user = user
   end
 
-  def call
+  def preauthorise
     tva_response = tva_connection.post do |req|
       req.url '/permissions'
       req.headers['Authorization'] = "Token token=#{ENV['TVA_TOKEN']}"

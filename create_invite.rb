@@ -1,6 +1,6 @@
 require 'faraday'
 require 'notifications/client'
-require './preauthorise'
+require './authorisation'
 require './send_email'
 require './create_dfe_sign_in_user'
 
@@ -12,7 +12,7 @@ class CreateInvite
   end
 
   def call
-    Preauthorise.new(@user).call
+    Authorisation.new(@user).preauthorise
     SendEmail.new(@user).call
     CreateDfeSignInUser.new(@user).call
   rescue InvitationFailed => e
