@@ -1,5 +1,6 @@
 require 'faraday'
 require 'notifications/client'
+require './preauthorise'
 
 class CreateInvite
   class InvitationFailed < RuntimeError; end
