@@ -2,13 +2,13 @@ require 'faraday'
 require 'notifications/client'
 require './preauthorise'
 require './send_email'
+require './create_dfe_sign_in_user'
 
 class CreateInvite
   class InvitationFailed < RuntimeError; end
 
-  def initialize(user:, jwt_token:)
+  def initialize(user:)
     @user = user
-    @jwt_token = jwt_token
   end
 
   def call
@@ -18,18 +18,7 @@ class CreateInvite
         raise InvitationFailed, tva_response.body
       end
       SendEmail.new(@user).call
-
-      sign_in_response = @sign_in_connection.post do |req|
-        req.url "/services/#{ENV['DFE_SIGN_IN_SERVICE_ID']}/invitations"
-        req.headers['Authorization'] = "bearer #{@jwt_token}"
-        req.headers['Content-Type'] = 'application/json'
-        req.body = JSON.generate(sign_in_params)
-      end
-      if sign_in_response.success?
-        puts "Created invitation for #{@user[:email]}"
-        return true
-      end
-      raise InvitationFailed, sign_in_response.body
+      CreateDfeSignInUser.new(@user).call
 
     rescue InvitationFailed => e
       log_error(e.message)
@@ -40,15 +29,5 @@ class CreateInvite
 
   def log_error(response_body)
     puts "Error creating invitation for #{@user[:email]}. Response: #{response_body}"
-  end
-
-  def sign_in_params
-    {
-      sourceId: :user_id_in_your_service,
-      given_name: @user[:given_name],
-      family_name: @user[:family_name],
-      email: @user[:email],
-      userRedirect: ENV['TEACHING_JOBS_SIGN_IN_URL']
-    }
   end
 end

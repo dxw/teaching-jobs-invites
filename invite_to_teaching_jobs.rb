@@ -11,17 +11,8 @@ users = [
   {email: 'robbie.paul+16@dxw.com', given_name: 'Robbie', family_name: 'Paul', school_urn: '137138'},
 ]
 
-def generate_jwt_token
-  payload = {
-    iss: 'schooljobs',
-    exp: (Time.now + 60).to_i,
-    aud: 'signin.education.gov.uk'
-  }
-  JWT.encode payload, ENV['DFE_SIGN_IN_API_PASSWORD'], 'HS256'
-end
-
 results = users.map do |user|
-  create_invite = CreateInvite.new(user: user, jwt_token: generate_jwt_token)
+  create_invite = CreateInvite.new(user: user)
   create_invite.call
 end
 
