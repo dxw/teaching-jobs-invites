@@ -1,6 +1,7 @@
 require 'faraday'
 require 'notifications/client'
 require './preauthorise'
+require './send_email'
 
 class CreateInvite
   class InvitationFailed < RuntimeError; end
@@ -8,8 +9,6 @@ class CreateInvite
   def initialize(user:, jwt_token:)
     @user = user
     @jwt_token = jwt_token
-    @sign_in_connection = Faraday.new(ENV['DFE_SIGN_IN_API_URL'])
-    @notify_client = Notifications::Client.new(ENV['NOTIFY_KEY'])
   end
 
   def call
@@ -18,15 +17,8 @@ class CreateInvite
       unless tva_response.success?
         raise InvitationFailed, tva_response.body
       end
-      @notify_client.send_email(
-        email_address: @user[:email],
-        template_id: ENV['NOTIFY_TEMPLATE_ID'],
-        personalisation: {
-          first_name: @user[:given_name],
-          school_name: @user[:school]
-        },
-        reference: "your_reference_string"
-      )
+      SendEmail.new(@user).call
+
       sign_in_response = @sign_in_connection.post do |req|
         req.url "/services/#{ENV['DFE_SIGN_IN_SERVICE_ID']}/invitations"
         req.headers['Authorization'] = "bearer #{@jwt_token}"
