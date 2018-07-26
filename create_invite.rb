@@ -3,6 +3,7 @@ require 'notifications/client'
 require './authorisation'
 require './send_email'
 require './create_dfe_sign_in_user'
+require 'pry'
 
 class CreateInvite
   class InvitationFailed < RuntimeError; end
