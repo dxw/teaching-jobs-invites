@@ -17,6 +17,7 @@ class SendEmail
       template_id: ENV['NOTIFY_WELCOME_TEMPLATE_ID'],
       personalisation: {
         first_name: @user[:given_name],
+        family_name: @user[:family_name],
         school_name: @user[:school_name]
       },
       reference: 'welcome-to-teaching-jobs-email'
