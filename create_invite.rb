@@ -12,17 +12,11 @@ class CreateInvite
   end
 
   def call
-    begin
-      tva_response = Preauthorise.new(@user).call
-      unless tva_response.success?
-        raise InvitationFailed, tva_response.body
-      end
-      SendEmail.new(@user).call
-      CreateDfeSignInUser.new(@user).call
-
-    rescue InvitationFailed => e
-      log_error(e.message)
-    end
+    Preauthorise.new(@user).call
+    SendEmail.new(@user).call
+    CreateDfeSignInUser.new(@user).call
+  rescue InvitationFailed => e
+    log_error(e.message)
   end
 
   private
