@@ -7,4 +7,7 @@ gem 'jwt'
 gem 'faraday'
 gem 'notifications-ruby-client'
 gem 'dotenv'
+
 gem 'pry'
+gem 'rspec'
+gem 'webmock'
