@@ -4,10 +4,21 @@ require 'dotenv/load'
 require 'json'
 require 'jwt'
 require './create_invite'
+require 'csv'
 
-users = [
-  {email: 'tom.hipkin+45@digital.education.gov.uk', given_name: 'Tom', family_name: 'Hipkin', school_name: 'Macmillan Academy', school_urn: '137138'},
-]
+users = []
+options = { encoding: 'UTF-8', skip_blanks: true }
+CSV.foreach('users.csv', options).with_index do |row, i|
+  next if i.zero?
+  user = {
+    email: row[0],
+    given_name: row[1],
+    family_name: row[2],
+    school_name: row[3],
+    school_urn: row[4]
+  }
+  users << user
+end
 
 results = users.map do |user|
   create_invite = CreateInvite.new(user: user)
