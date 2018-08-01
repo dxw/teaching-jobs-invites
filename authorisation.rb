@@ -12,8 +12,8 @@ class Authorisation
         req.headers['Authorization'] = "Token token=#{ENV['TVA_TOKEN']}"
         req.headers['Content-Type'] = 'application/json'
         req.body = JSON.generate(
-            user_token: @user[:email],
-            school_urn: school[:school_urn]
+          user_token: @user[:email],
+          school_urn: school[:school_urn]
         )
       end
       raise InvitationFailed, tva_response.body unless tva_response.success?
