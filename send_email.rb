@@ -18,9 +18,13 @@ class SendEmail
       personalisation: {
         first_name: @user[:given_name],
         family_name: @user[:family_name],
-        school_name: @user[:school_name]
+        school_name: school_name_or_how_many
       },
       reference: 'welcome-to-teaching-jobs-email'
     )
+  end
+
+  private def school_name_or_how_many
+    @user[:schools].count > 1 ? "#{@user[:schools].count} schools" : @user[:schools].first[:school_name]
   end
 end

@@ -4,21 +4,16 @@ require 'dotenv/load'
 require 'json'
 require 'jwt'
 require './create_invite'
+require './csv_rows_to_user'
 require 'csv'
 
-users = []
-options = { encoding: 'UTF-8', skip_blanks: true }
-CSV.foreach('users.csv', options).with_index do |row, i|
-  next if i.zero?
-  user = {
-    email: row[0],
-    given_name: row[1],
-    family_name: row[2],
-    school_name: row[3],
-    school_urn: row[4]
-  }
-  users << user
+rows = []
+options = { encoding: 'UTF-8', skip_blanks: true, headers: true }
+CSV.foreach('users.csv', options) do |row|
+  rows << row.to_h.transform_keys!(&:to_sym)
 end
+
+users = CsvRowsToUser.new(rows).transform
 
 results = users.map do |user|
   create_invite = CreateInvite.new(user: user)

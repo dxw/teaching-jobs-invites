@@ -26,11 +26,10 @@ RSpec.describe 'Individual invitation' do
       email: 'test@digital.education.gov.uk',
       given_name: 'Test',
       family_name: 'Tester',
-      school_name: 'Macmillan Academy',
-      school_urn: '137138'
+      schools: [{school_name: 'Macmillan Academy', school_urn: '137138'}]
     }
 
-    authorisation_body = JSON.generate(user_token: user[:email], school_urn: user[:school_urn])
+    authorisation_body = JSON.generate(user_token: user[:email], school_urn: user[:schools].first[:school_urn])
     authorisation_stub = WebMock.stub_request(:post, 'https://www.example.com/permissions')
                                 .with(body: authorisation_body)
                                 .to_return(
@@ -48,7 +47,7 @@ RSpec.describe 'Individual invitation' do
         personalisation: {
           first_name: user[:given_name],
           family_name: user[:family_name],
-          school_name: user[:school_name]
+          school_name: user[:schools].first[:school_name]
         },
         reference: 'welcome-to-teaching-jobs-email'
       )
