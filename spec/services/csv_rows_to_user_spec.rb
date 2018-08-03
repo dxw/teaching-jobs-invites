@@ -1,4 +1,4 @@
-require './csv_rows_to_user'
+require './services/csv_rows_to_user'
 
 RSpec.describe CsvRowsToUser do
   describe '#transform' do

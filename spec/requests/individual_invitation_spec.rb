@@ -1,4 +1,4 @@
-require './create_invite'
+Dir['./services/*.rb'].each {|file| require file }
 
 RSpec.describe 'Individual invitation' do
   before(:each) do

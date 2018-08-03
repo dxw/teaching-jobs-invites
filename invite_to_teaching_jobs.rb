@@ -3,9 +3,9 @@ require 'bundler/setup'
 require 'dotenv/load'
 require 'json'
 require 'jwt'
-require './create_invite'
-require './csv_rows_to_user'
 require 'csv'
+
+Dir['./services/*.rb'].each {|file| require file }
 
 rows = []
 options = { encoding: 'UTF-8', skip_blanks: true, headers: true }
