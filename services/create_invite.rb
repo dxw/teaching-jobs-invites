@@ -1,6 +1,7 @@
 require 'faraday'
 require 'notifications/client'
 require 'pry'
+require 'logger'
 
 Dir["./services/*.rb"].each {|file| require file }
 
@@ -22,6 +23,6 @@ class CreateInvite
   private
 
   def log_error(response_body)
-    puts "Error creating invitation for #{@user[:email]}. Response: #{response_body}"
+    $logger.warn("Error creating invitation for #{@user[:email]}. Response: #{response_body}")
   end
 end
