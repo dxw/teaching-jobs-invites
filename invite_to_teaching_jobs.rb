@@ -4,6 +4,7 @@ require 'dotenv/load'
 require 'json'
 require 'jwt'
 require 'csv'
+require 'logger'
 
 Dir['./services/*.rb'].each {|file| require file }
 
