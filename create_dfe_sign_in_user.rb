@@ -38,7 +38,23 @@ class CreateDfeSignInUser
       given_name: @user[:given_name],
       family_name: @user[:family_name],
       email: @user[:email],
-      userRedirect: ENV['TEACHING_JOBS_SIGN_IN_URL']
+      userRedirect: ENV['TEACHING_JOBS_SIGN_IN_URL'],
+      inviteSubjectOverride: email_subject,
+      inviteBodyOverride: email_copy
     }
+  end
+
+  private def email_subject
+    "You’ve been invited to join DfE Sign-in by Teaching Jobs"
+  end
+
+  private def email_copy
+    "
+    You’ve received this email because you've been invited to the Teaching Jobs \
+    which is a free online service to list job roles within schools in England. \
+    This email will first help you register with DfE Sign-in before you will be able \
+    to sign in to the service \
+    https://www.gov.uk/guidance/list-a-teaching-role-at-your-school-on-teaching-jobs.
+    "
   end
 end
