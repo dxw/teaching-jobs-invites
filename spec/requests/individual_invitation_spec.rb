@@ -1,4 +1,4 @@
-require './create_invite'
+Dir['./services/*.rb'].each {|file| require file }
 
 RSpec.describe 'Individual invitation' do
   before(:each) do
@@ -22,14 +22,18 @@ RSpec.describe 'Individual invitation' do
   end
 
   it 'invites the user' do
+    allow(InviteToTeachingJobs).to receive(:user_data_file_name)
+      .and_return('./spec/fixtures/test_users.csv')
+
     user = {
       email: 'test@digital.education.gov.uk',
       given_name: 'Test',
       family_name: 'Tester',
-      schools: [{school_name: 'Macmillan Academy', school_urn: '137138'}]
+      school_name: 'Macmillan Academy',
+      school_urn: '137138'
     }
 
-    authorisation_body = JSON.generate(user_token: user[:email], school_urn: user[:schools].first[:school_urn])
+    authorisation_body = JSON.generate(user_token: user[:email], school_urn: user[:school_urn])
     authorisation_stub = WebMock.stub_request(:post, 'https://www.example.com/permissions')
                                 .with(body: authorisation_body)
                                 .to_return(
@@ -47,22 +51,30 @@ RSpec.describe 'Individual invitation' do
         personalisation: {
           first_name: user[:given_name],
           family_name: user[:family_name],
-          school_name: user[:schools].first[:school_name]
+          school_name: user[:school_name]
         },
         reference: 'welcome-to-teaching-jobs-email'
       )
 
     sign_in_payload = JSON.generate(sourceId: 'user_id_in_your_service',
-                                    given_name: 'Test',
-                                    family_name: 'Tester',
-                                    email: 'test@digital.education.gov.uk',
+                                    given_name: user[:given_name],
+                                    family_name: user[:family_name],
+                                    email: user[:email],
                                     userRedirect: '/callback')
     sign_in_stub = WebMock.stub_request(:post, 'https://sign-in.com/services/123456789/invitations')
                           .with(body: sign_in_payload)
                           .to_return(status: 200, body: '', headers: {})
 
-    create_invite = CreateInvite.new(user: user)
-    create_invite.call
+    mock_logger = instance_double(Logger)
+    allow(Logger).to receive(:new).and_return(mock_logger)
+    expect(mock_logger).to receive(:info)
+      .with('Successful: 1')
+    expect(mock_logger).to receive(:info)
+      .with('Failed: 0')
+    expect(mock_logger).to receive(:info)
+      .with('Created invitation for test@digital.education.gov.uk for ["137138"]')
+
+    InviteToTeachingJobs.run!
 
     WebMock.assert_requested(authorisation_stub)
     WebMock.assert_requested(sign_in_stub)
