@@ -13,6 +13,10 @@ class OrganisationFinder
     organisation_id
   end
 
+  def self.organisation_file_name
+    ENV['ENVIRONMENT'].eql?('test') ? 'dsi-test-organisations.csv' : 'dsi-prod-organisations.csv'
+  end
+
   LOOKUP_TABLE = {
     '137138' => 'daf3ea45-2eaf-484b-9975-f2ef0af7eb37'
   }.freeze

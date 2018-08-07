@@ -35,4 +35,36 @@ RSpec.describe OrganisationFinder do
       end
     end
   end
+
+  describe '.organisation_file_name' do
+    context 'when the environment is production' do
+      before(:each) do
+        ENV['ENVIRONMENT'] = 'production'
+      end
+
+      after(:each) do
+        ENV.delete('ENVIRONMENT')
+      end
+
+      it 'returns the DfE Sign-in production organisation CSV file path' do
+        expect(described_class.organisation_file_name)
+          .to eql('dsi-prod-organisations.csv')
+      end
+    end
+
+    context 'when the environment is test' do
+      before(:each) do
+        ENV['ENVIRONMENT'] = 'test'
+      end
+
+      after(:each) do
+        ENV.delete('ENVIRONMENT')
+      end
+
+      it 'returns the DfE Sign-in test organisation CSV file path' do
+        expect(described_class.organisation_file_name)
+          .to eql('dsi-test-organisations.csv')
+      end
+    end
+  end
 end

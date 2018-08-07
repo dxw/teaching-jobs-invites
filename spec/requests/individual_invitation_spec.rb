@@ -9,6 +9,7 @@ RSpec.describe 'Individual invitation' do
     ENV['DFE_SIGN_IN_API_URL'] = 'https://sign-in.com'
     ENV['DFE_SIGN_IN_SERVICE_ID'] = '123456789'
     ENV['TEACHING_JOBS_SIGN_IN_URL'] = '/callback'
+    ENV['ENVIRONMENT'] = 'test'
   end
 
   after(:each) do
@@ -19,6 +20,7 @@ RSpec.describe 'Individual invitation' do
     ENV.delete('DFE_SIGN_IN_API_URL')
     ENV.delete('DFE_SIGN_IN_SERVICE_ID')
     ENV.delete('TEACHING_JOBS_SIGN_IN_URL')
+    ENV.delete('ENVIRONMENT')
   end
 
   it 'invites the user' do
