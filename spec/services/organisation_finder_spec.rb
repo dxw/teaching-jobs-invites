@@ -4,25 +4,16 @@ require 'logger'
 RSpec.describe OrganisationFinder do
   describe '.call' do
     before(:each) do
-      stub_const(
-        'OrganisationFinder::LOOKUP_TABLE',
-        { '137138' => 'daf3ea45-2eaf-484b-9975-f2ef0af7eb37' }
-      )
+      allow(described_class).to receive(:organisation_file_name)
+        .and_return('./spec/fixtures/dsi-test-organisations.csv')
     end
 
     it 'returns the matching organisation_id for a given school_urn' do
-      expect(described_class.call(school_urn: '137138'))
-        .to eq('daf3ea45-2eaf-484b-9975-f2ef0af7eb37')
+      expect(described_class.call(school_urn: '103652'))
+        .to eq('E552F3B4-4C1C-43B1-A2BC-000040C04C60')
     end
 
     context 'when that school_urn does not match to an organisation_id' do
-      before(:each) do
-        stub_const(
-          'OrganisationFinder::LOOKUP_TABLE',
-          { '1' => '2' }
-        )
-      end
-
       it 'lets the user know that no attachment could be made' do
         mock_logger = instance_double(Logger)
         allow(Logger).to receive(:new).and_return(mock_logger)

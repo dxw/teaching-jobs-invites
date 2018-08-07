@@ -13,7 +13,7 @@ class CreateDfeSignInUser
       req.body = JSON.generate(sign_in_params)
     end
     if sign_in_response.success?
-      Logger.new($stdout).info("Created invitation for #{@user[:email]} for #{@user[:schools].map {|school| school[:school_urn] }}")
+      Logger.new($stdout).info("Created DfE Sign-in invitation for #{@user[:email]} for #{@user[:school_urn]}")
       return true
     end
     raise InvitationFailed, sign_in_response.body
@@ -38,7 +38,8 @@ class CreateDfeSignInUser
       given_name: @user[:given_name],
       family_name: @user[:family_name],
       email: @user[:email],
-      userRedirect: ENV['TEACHING_JOBS_SIGN_IN_URL']
+      userRedirect: ENV['TEACHING_JOBS_SIGN_IN_URL'],
+      organisation: OrganisationFinder.call(school_urn: @user[:school_urn])
     }
   end
 end
