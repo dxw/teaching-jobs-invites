@@ -75,6 +75,10 @@ RSpec.describe 'Individual invitation' do
     mock_logger = instance_double(Logger)
     allow(Logger).to receive(:new).and_return(mock_logger)
     expect(mock_logger).to receive(:info)
+      .with('Preauthorised test@digital.education.gov.uk for 144048')
+    expect(mock_logger).to receive(:info)
+      .with('Sent welcome email to test@digital.education.gov.uk for Crown Wood Primary School')
+    expect(mock_logger).to receive(:info)
       .with('Created DfE Sign-in invitation for test@digital.education.gov.uk for 144048')
 
     InviteToTeachingJobs.run!

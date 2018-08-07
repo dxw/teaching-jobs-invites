@@ -15,6 +15,8 @@ class Authorisation
         school_urn: @user[:school_urn]
       )
     end
+    Logger.new($stdout).info("Preauthorised #{@user[:email]} for #{@user[:school_urn]}")
+
     raise InvitationFailed, tva_response.body unless tva_response.success?
   end
 
