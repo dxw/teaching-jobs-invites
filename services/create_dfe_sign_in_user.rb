@@ -1,8 +1,9 @@
 class CreateDfeSignInUser
   class InvitationFailed < RuntimeError; end
 
-  def initialize(user)
+  def initialize(user:, organisation_finder:)
     @user = user
+    @organisation_finder = organisation_finder
   end
 
   def call
@@ -39,7 +40,7 @@ class CreateDfeSignInUser
       family_name: @user[:family_name],
       email: @user[:email],
       userRedirect: ENV['TEACHING_JOBS_SIGN_IN_URL'],
-      organisation: OrganisationFinder.call(school_urn: @user[:school_urn])
+      organisation: @organisation_finder.call(school_urn: @user[:school_urn])
     }
   end
 end

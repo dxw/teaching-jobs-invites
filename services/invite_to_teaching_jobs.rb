@@ -25,8 +25,9 @@ class InviteToTeachingJobs
       SendEmail.new(user).call
     end
 
+    organisation_finder = OrganisationFinder.new
     users.map do |user|
-      CreateDfeSignInUser.new(user).call
+      CreateDfeSignInUser.new(user: user, organisation_finder: organisation_finder).call
     end
 
   rescue InvitationFailed => e

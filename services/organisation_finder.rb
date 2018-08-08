@@ -3,7 +3,11 @@ require 'pry'
 require 'csv'
 
 class OrganisationFinder
-  def self.call(school_urn:)
+  def initialize
+    load_organisations
+  end
+
+  def call(school_urn:)
     organisation_id = organisations[school_urn]
 
     if organisation_id.nil?
@@ -14,18 +18,25 @@ class OrganisationFinder
     organisation_id
   end
 
-  def self.organisation_file_name
+  def organisation_file_name
     ENV['ENVIRONMENT'].eql?('test') ? 'dsi-test-organisations.csv' : 'dsi-prod-organisations.csv'
   end
 
-  def self.organisations
-    organisations = {}
-    options = { encoding: 'UTF-8', skip_blanks: true, headers: true }
-
-    CSV.foreach(organisation_file_name, options) do |row|
-      organisations.merge!({ row['school_urn'] => row['organisation_id'] })
-    end
-
+  private def load_organisations
     organisations
   end
+
+  private def organisations
+    @organisations ||= begin
+      organisations = {}
+      options = { encoding: 'UTF-8', skip_blanks: true, headers: true }
+
+      CSV.foreach(organisation_file_name, options) do |row|
+        organisations.merge!({ row['school_urn'] => row['organisation_id'] })
+      end
+
+      organisations
+    end
+  end
+  alias_method :all, :organisations
 end

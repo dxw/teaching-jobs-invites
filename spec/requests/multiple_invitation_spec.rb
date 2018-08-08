@@ -26,7 +26,7 @@ RSpec.describe 'Multiple invitations' do
       allow(InviteToTeachingJobs).to receive(:user_data_file_name)
         .and_return('./spec/fixtures/multiple_test_users.csv')
 
-      allow(OrganisationFinder).to receive(:organisation_file_name)
+      allow_any_instance_of(OrganisationFinder).to receive(:organisation_file_name)
         .and_return('./spec/fixtures/dsi-test-organisations.csv')
 
       first_row = {
