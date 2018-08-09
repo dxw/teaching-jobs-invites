@@ -66,7 +66,9 @@ RSpec.describe 'Individual invitation' do
                                     family_name: user[:family_name],
                                     email: user[:email],
                                     userRedirect: '/callback',
-                                    organisation: '7FE7B046-3016-4339-A6C7-00267187C523'
+                                    organisation: '7FE7B046-3016-4339-A6C7-00267187C523',
+                                    inviteSubjectOverride: "You’ve been invited to join DfE Sign-in by Teaching Jobs",
+                                    inviteBodyOverride: "Teaching Jobs is a free online service for schools in England to list their teaching roles. To use it, schools must first register with DfE Sign-in. Save the following link, which you’ll use to securely access the service once you’ve registered: https://www.gov.uk/guidance/list-a-teaching-role-at-your-school-on-teaching-jobs"
                                   )
     sign_in_stub = WebMock.stub_request(:post, 'https://sign-in.com/services/123456789/invitations')
                           .with(body: sign_in_payload)

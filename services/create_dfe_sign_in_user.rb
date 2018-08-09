@@ -40,7 +40,17 @@ class CreateDfeSignInUser
       family_name: @user[:family_name],
       email: @user[:email],
       userRedirect: ENV['TEACHING_JOBS_SIGN_IN_URL'],
-      organisation: @organisation_finder.call(school_urn: @user[:school_urn])
+      organisation: @organisation_finder.call(school_urn: @user[:school_urn]),
+      inviteSubjectOverride: email_subject,
+      inviteBodyOverride: email_copy
     }
+  end
+
+  private def email_subject
+    "You’ve been invited to join DfE Sign-in by Teaching Jobs"
+  end
+
+  private def email_copy
+    "Teaching Jobs is a free online service for schools in England to list their teaching roles. To use it, schools must first register with DfE Sign-in. Save the following link, which you’ll use to securely access the service once you’ve registered: https://www.gov.uk/guidance/list-a-teaching-role-at-your-school-on-teaching-jobs"
   end
 end
