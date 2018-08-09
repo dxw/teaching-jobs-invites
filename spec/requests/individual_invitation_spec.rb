@@ -9,6 +9,7 @@ RSpec.describe 'Individual invitation' do
     ENV['DFE_SIGN_IN_API_URL'] = 'https://sign-in.com'
     ENV['DFE_SIGN_IN_SERVICE_ID'] = '123456789'
     ENV['TEACHING_JOBS_SIGN_IN_URL'] = '/callback'
+    ENV['ENVIRONMENT'] = 'test'
   end
 
   after(:each) do
@@ -19,18 +20,22 @@ RSpec.describe 'Individual invitation' do
     ENV.delete('DFE_SIGN_IN_API_URL')
     ENV.delete('DFE_SIGN_IN_SERVICE_ID')
     ENV.delete('TEACHING_JOBS_SIGN_IN_URL')
+    ENV.delete('ENVIRONMENT')
   end
 
   it 'invites the user' do
     allow(InviteToTeachingJobs).to receive(:user_data_file_name)
-      .and_return('./spec/fixtures/test_users.csv')
+      .and_return('./spec/fixtures/individual_test_users.csv')
+
+    allow_any_instance_of(OrganisationFinder).to receive(:organisation_file_name)
+      .and_return('./spec/fixtures/dsi-test-organisations.csv')
 
     user = {
       email: 'test@digital.education.gov.uk',
       given_name: 'Test',
       family_name: 'Tester',
-      school_name: 'Macmillan Academy',
-      school_urn: '137138'
+      school_name: 'Crown Wood Primary School',
+      school_urn: '144048'
     }
 
     authorisation_body = JSON.generate(user_token: user[:email], school_urn: user[:school_urn])
@@ -38,7 +43,7 @@ RSpec.describe 'Individual invitation' do
                                 .with(body: authorisation_body)
                                 .to_return(
                                   status: 200,
-                                  body: '{"id":83,"user_token":"test@digital.education.gov.uk","school_urn":"137138","created_at":"2018-07-27T08:54:49.673Z"}'
+                                  body: '{"id":83,"user_token":"test@digital.education.gov.uk","school_urn":"144048","created_at":"2018-07-27T08:54:49.673Z"}'
                                 )
 
     notify_client = instance_double(Notifications::Client)
@@ -51,7 +56,7 @@ RSpec.describe 'Individual invitation' do
         personalisation: {
           first_name: user[:given_name],
           family_name: user[:family_name],
-          school_name: user[:school_name]
+          school_name: user[:school_name],
         },
         reference: 'welcome-to-teaching-jobs-email'
       )
@@ -60,7 +65,9 @@ RSpec.describe 'Individual invitation' do
                                     given_name: user[:given_name],
                                     family_name: user[:family_name],
                                     email: user[:email],
-                                    userRedirect: '/callback')
+                                    userRedirect: '/callback',
+                                    organisation: '7FE7B046-3016-4339-A6C7-00267187C523'
+                                  )
     sign_in_stub = WebMock.stub_request(:post, 'https://sign-in.com/services/123456789/invitations')
                           .with(body: sign_in_payload)
                           .to_return(status: 200, body: '', headers: {})
@@ -68,11 +75,11 @@ RSpec.describe 'Individual invitation' do
     mock_logger = instance_double(Logger)
     allow(Logger).to receive(:new).and_return(mock_logger)
     expect(mock_logger).to receive(:info)
-      .with('Successful: 1')
+      .with('Preauthorised test@digital.education.gov.uk for 144048')
     expect(mock_logger).to receive(:info)
-      .with('Failed: 0')
+      .with('Sent welcome email to test@digital.education.gov.uk for Crown Wood Primary School')
     expect(mock_logger).to receive(:info)
-      .with('Created invitation for test@digital.education.gov.uk for ["137138"]')
+      .with('Created DfE Sign-in invitation for test@digital.education.gov.uk for 144048')
 
     InviteToTeachingJobs.run!
 

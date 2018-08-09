@@ -1,26 +1,44 @@
+require 'faraday'
+require 'notifications/client'
+require 'pry'
+require 'logger'
 require 'csv'
 
+Dir["./services/*.rb"].each {|file| require file }
+
 class InviteToTeachingJobs
+  class InvitationFailed < RuntimeError; end
+
   def self.run!
-    rows = []
+    users = []
     options = { encoding: 'UTF-8', skip_blanks: true, headers: true }
     CSV.foreach(user_data_file_name, options) do |row|
-      rows << row.to_h.transform_keys!(&:to_sym)
+      users << row.to_h.transform_keys!(&:to_sym)
     end
 
-    users = CsvRowsToUser.new(rows).transform
-
-    results = users.map do |user|
-      create_invite = CreateInvite.new(user: user)
-      create_invite.call
+    users.map do |user|
+      Authorisation.new(user).preauthorise
     end
 
-    logger = Logger.new($stdout)
-    logger.info("Successful: #{results.compact.count}")
-    logger.info("Failed: #{results.count - results.compact.count}")
+    unique_users = CsvRowsToUser.new(users).transform
+    unique_users.map do |user|
+      SendEmail.new(user).call
+    end
+
+    organisation_finder = OrganisationFinder.new
+    users.map do |user|
+      CreateDfeSignInUser.new(user: user, organisation_finder: organisation_finder).call
+    end
+
+  rescue InvitationFailed => e
+    log_error(e.message)
   end
 
   def self.user_data_file_name
     'users.csv'
+  end
+
+  private def log_error(response_body)
+    $logger.warn("Error creating invitation for #{@user[:email]}. Response: #{response_body}")
   end
 end

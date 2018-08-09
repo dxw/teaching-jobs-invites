@@ -22,6 +22,7 @@ class SendEmail
       },
       reference: 'welcome-to-teaching-jobs-email'
     )
+    Logger.new($stdout).info("Sent welcome email to #{@user[:email]} for #{school_name_or_how_many}")
   end
 
   private def school_name_or_how_many
