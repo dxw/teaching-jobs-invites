@@ -4,7 +4,7 @@ RSpec.describe 'Individual invitation' do
   before(:each) do
     ENV['TVA_URL'] = 'https://www.example.com'
     ENV['NOTIFY_KEY'] = 'abc'
-    ENV['NOTIFY_WELCOME_TEMPLATE_ID'] = '123'
+    ENV['NOTIFY_WELCOME_SINGLE_TEMPLATE_ID'] = '123'
     ENV['DFE_SIGN_IN_API_PASSWORD'] = '456'
     ENV['DFE_SIGN_IN_API_URL'] = 'https://sign-in.com'
     ENV['DFE_SIGN_IN_SERVICE_ID'] = '123456789'
@@ -15,7 +15,7 @@ RSpec.describe 'Individual invitation' do
   after(:each) do
     ENV.delete('TVA_URL')
     ENV.delete('NOTIFY_KEY')
-    ENV.delete('NOTIFY_WELCOME_TEMPLATE_ID')
+    ENV.delete('NOTIFY_WELCOME_SINGLE_TEMPLATE_ID')
     ENV.delete('DFE_SIGN_IN_API_PASSWORD')
     ENV.delete('DFE_SIGN_IN_API_URL')
     ENV.delete('DFE_SIGN_IN_SERVICE_ID')
@@ -52,7 +52,7 @@ RSpec.describe 'Individual invitation' do
       .to receive(:send_email)
       .with(
         email_address: user[:email],
-        template_id: ENV['NOTIFY_WELCOME_TEMPLATE_ID'],
+        template_id: ENV['NOTIFY_WELCOME_SINGLE_TEMPLATE_ID'],
         personalisation: {
           first_name: user[:given_name],
           family_name: user[:family_name],

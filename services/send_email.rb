@@ -4,28 +4,43 @@ class SendEmail
   end
 
   def call
-    send_welcome_email
+    if @user[:schools].count > 1
+      send_trust_welcome_email
+    else
+      send_single_welcome_email
+    end
   end
 
   private def notify_client
     Notifications::Client.new(ENV['NOTIFY_KEY'])
   end
 
-  private def send_welcome_email
+  private def send_single_welcome_email
     notify_client.send_email(
       email_address: @user[:email],
-      template_id: ENV['NOTIFY_WELCOME_TEMPLATE_ID'],
+      template_id: ENV['NOTIFY_WELCOME_SINGLE_TEMPLATE_ID'],
       personalisation: {
         first_name: @user[:given_name],
         family_name: @user[:family_name],
-        school_name: school_name_or_how_many
+        school_name: @user[:schools].first[:school_name]
       },
       reference: 'welcome-to-teaching-jobs-email'
     )
-    Logger.new($stdout).info("Sent welcome email to #{@user[:email]} for #{school_name_or_how_many}")
+    Logger.new($stdout).info("Sent welcome email to #{@user[:email]} for #{@user[:schools].first[:school_name]}")
   end
 
-  private def school_name_or_how_many
-    @user[:schools].count > 1 ? "#{@user[:schools].count} schools" : @user[:schools].first[:school_name]
+  private def send_trust_welcome_email
+    notify_client.send_email(
+      email_address: @user[:email],
+      template_id: ENV['NOTIFY_WELCOME_TRUST_TEMPLATE_ID'],
+      personalisation: {
+        first_name: @user[:given_name],
+        family_name: @user[:family_name],
+        school_name: "#{@user[:schools].count} schools",
+        trust_name: @user[:trust_name] || 'your trust'
+      },
+      reference: 'welcome-to-teaching-jobs-email'
+    )
+    Logger.new($stdout).info("Sent welcome email to #{@user[:email]} for #{@user[:schools].count} schools")
   end
 end

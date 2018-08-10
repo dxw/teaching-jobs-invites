@@ -4,7 +4,7 @@ RSpec.describe 'Multiple invitations' do
   before(:each) do
     ENV['TVA_URL'] = 'https://www.example.com'
     ENV['NOTIFY_KEY'] = 'abc'
-    ENV['NOTIFY_WELCOME_TEMPLATE_ID'] = '123'
+    ENV['NOTIFY_WELCOME_TRUST_TEMPLATE_ID'] = '111'
     ENV['DFE_SIGN_IN_API_PASSWORD'] = '456'
     ENV['DFE_SIGN_IN_API_URL'] = 'https://sign-in.com'
     ENV['DFE_SIGN_IN_SERVICE_ID'] = '123456789'
@@ -14,7 +14,7 @@ RSpec.describe 'Multiple invitations' do
   after(:each) do
     ENV.delete('TVA_URL')
     ENV.delete('NOTIFY_KEY')
-    ENV.delete('NOTIFY_WELCOME_TEMPLATE_ID')
+    ENV.delete('NOTIFY_WELCOME_TRUST_TEMPLATE_ID')
     ENV.delete('DFE_SIGN_IN_API_PASSWORD')
     ENV.delete('DFE_SIGN_IN_API_URL')
     ENV.delete('DFE_SIGN_IN_SERVICE_ID')
@@ -34,7 +34,8 @@ RSpec.describe 'Multiple invitations' do
         given_name: 'Test',
         family_name: 'Tester',
         school_name: 'St Christopher Primary School',
-        school_urn: '103652'
+        school_urn: '103652',
+        trust_name: 'CPE'
       }
 
       first_authorisation_body = JSON.generate(user_token: first_row[:email], school_urn: first_row[:school_urn])
@@ -50,7 +51,8 @@ RSpec.describe 'Multiple invitations' do
         given_name: 'Test',
         family_name: 'Tester',
         school_name: 'Macmillan Academy',
-        school_urn: '137138'
+        school_urn: '137138',
+        trust_name: 'CPE'
       }
       second_authorisation_body = JSON.generate(user_token: second_row[:email], school_urn: second_row[:school_urn])
       second_authorisation_stub = WebMock.stub_request(:post, 'https://www.example.com/permissions')
@@ -66,11 +68,12 @@ RSpec.describe 'Multiple invitations' do
         .to receive(:send_email)
         .with(
           email_address: first_row[:email],
-          template_id: ENV['NOTIFY_WELCOME_TEMPLATE_ID'],
+          template_id: ENV['NOTIFY_WELCOME_TRUST_TEMPLATE_ID'],
           personalisation: {
             first_name: first_row[:given_name],
             family_name: first_row[:family_name],
-            school_name: '2 schools'
+            school_name: '2 schools',
+            trust_name: first_row[:trust_name]
           },
           reference: 'welcome-to-teaching-jobs-email'
         ).once
