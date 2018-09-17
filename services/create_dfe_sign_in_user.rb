@@ -1,6 +1,4 @@
 class CreateDfeSignInUser
-  class InvitationFailed < RuntimeError; end
-
   attr_reader :email, :given_name, :family_name, :school_urn, :organisation_finder
 
   def initialize(user:, organisation_finder:)

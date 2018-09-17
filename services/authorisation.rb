@@ -1,6 +1,4 @@
 class Authorisation
-  class InvitationFailed < RuntimeError; end
-
   def initialize(user)
     @user = user
   end

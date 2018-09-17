@@ -24,7 +24,9 @@ RSpec.describe 'Individual invitation' do
   end
 
   it 'invites the user' do
-    allow(InviteToTeachingJobs).to receive(:user_data_file_name)
+    invite_to_teaching_jobs = InviteToTeachingJobs.new
+
+    allow(invite_to_teaching_jobs).to receive(:user_data_file_name)
       .and_return('./spec/fixtures/individual_test_users.csv')
 
     allow_any_instance_of(OrganisationFinder).to receive(:organisation_file_name)
@@ -82,8 +84,13 @@ RSpec.describe 'Individual invitation' do
       .with('Sent welcome email to test@digital.education.gov.uk for Crown Wood Primary School')
     expect(mock_logger).to receive(:info)
       .with('Created DfE Sign-in invitation for test@digital.education.gov.uk for 144048')
+    expect(mock_logger).to receive(:info)
+      .with('1 emails were sent.')
+    expect(mock_logger).to receive(:info)
+      .with('1 user accounts have been associated with 1 schools.')
 
-    InviteToTeachingJobs.run!
+
+    invite_to_teaching_jobs.run
 
     WebMock.assert_requested(authorisation_stub)
     WebMock.assert_requested(sign_in_stub)
