@@ -29,8 +29,8 @@ RSpec.describe 'Individual invitation' do
     allow(invite_to_teaching_jobs).to receive(:user_data_file_name)
       .and_return('./spec/fixtures/individual_test_users.csv')
 
-    allow_any_instance_of(OrganisationFinder).to receive(:organisation_file_name)
-      .and_return('./spec/fixtures/dsi-test-organisations.csv')
+    allow(DSI::Organisations).to receive_message_chain(:new, :find)
+      .and_return('7FE7B046-3016-4339-A6C7-00267187C523')
 
     user = {
       email: 'test@digital.education.gov.uk',

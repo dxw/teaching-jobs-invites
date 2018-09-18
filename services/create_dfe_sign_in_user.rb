@@ -1,12 +1,13 @@
-class CreateDfeSignInUser
-  attr_reader :email, :given_name, :family_name, :school_urn, :organisation_finder
+require_relative 'dsi/organisations'
 
-  def initialize(user:, organisation_finder:)
+class CreateDfeSignInUser
+  attr_reader :email, :given_name, :family_name, :school_urn
+
+  def initialize(user:)
     @email = user[:email].strip
     @given_name = user[:given_name].strip
     @family_name = user[:family_name].strip
     @school_urn = user[:school_urn].strip
-    @organisation_finder = organisation_finder
   end
 
   def call
@@ -43,7 +44,7 @@ class CreateDfeSignInUser
       family_name: family_name,
       email: email,
       userRedirect: ENV['TEACHING_JOBS_SIGN_IN_URL'],
-      organisation: organisation_finder.call(school_urn: school_urn),
+      organisation: DSI::Organisations.new.find(school_urn),
       inviteSubjectOverride: email_subject,
       inviteBodyOverride: email_copy
     }

@@ -28,8 +28,12 @@ RSpec.describe 'Multiple invitations' do
       allow(invite_to_teaching_jobs).to receive(:user_data_file_name)
         .and_return('./spec/fixtures/multiple_test_users.csv')
 
-      allow_any_instance_of(OrganisationFinder).to receive(:organisation_file_name)
-        .and_return('./spec/fixtures/dsi-test-organisations.csv')
+      allow(DSI::Organisations).to receive_message_chain(:new, :find).with('144048')
+        .and_return('7FE7B046-3016-4339-A6C7-00267187C523')
+      expect(DSI::Organisations).to receive_message_chain(:new, :find).with('103652')
+        .and_return('E552F3B4-4C1C-43B1-A2BC-000040C04C60')
+      expect(DSI::Organisations).to receive_message_chain(:new, :find).with('137138')
+        .and_return('5BE7D1AE-D281-4DF1-8F93-0001BE69E525')
 
       first_row = {
         email: 'test@digital.education.gov.uk',

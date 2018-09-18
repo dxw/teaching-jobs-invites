@@ -30,9 +30,8 @@ class InviteToTeachingJobs
       SendEmail.new(user).call
     end
 
-    organisation_finder = OrganisationFinder.new
     users.map do |user|
-      CreateDfeSignInUser.new(user: user, organisation_finder: organisation_finder).call
+      CreateDfeSignInUser.new(user: user).call
     end
 
     logger.info "#{users.count} user accounts have been associated with #{unique_school_count} schools."

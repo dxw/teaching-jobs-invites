@@ -1,12 +1,13 @@
-require './services/organisation_finder'
 require './services/create_dfe_sign_in_user'
 require 'faraday'
 require 'notifications/client'
 
-RSpec.describe CreateDfeSignInUser do
+RSpec.describe CreateDfeSignInUser, type: :dsi do
   context 'initialize' do
+    let(:bearer) { 'token' }
     it 'strips surrounding space from all parameters' do
-      organisation_finder = OrganisationFinder.new
+      allow(DSI::Organisations).to receive_message_chain(:new, :call).and_return(nil)
+
       request = double(:request, url: 'some url', headers: {})
       response = double(:response, success?: true)
 
@@ -15,7 +16,9 @@ RSpec.describe CreateDfeSignInUser do
                family_name: ' Family name ',
                school_urn: '123423   '}
 
-      create_dfe_sign_in_user = described_class.new(user: user, organisation_finder: organisation_finder)
+      expect(DSI::Organisations).to receive_message_chain(:new, :find).with('123423')
+
+      create_dfe_sign_in_user = described_class.new(user: user)
       expect(JWT).to receive(:encode)
       expect(Faraday).to receive_message_chain(:new, :post).and_yield(request).and_return(response)
 
