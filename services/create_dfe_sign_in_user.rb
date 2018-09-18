@@ -1,8 +1,11 @@
 class CreateDfeSignInUser
-  class InvitationFailed < RuntimeError; end
+  attr_reader :email, :given_name, :family_name, :school_urn, :organisation_finder
 
   def initialize(user:, organisation_finder:)
-    @user = user
+    @email = user[:email].strip
+    @given_name = user[:given_name].strip
+    @family_name = user[:family_name].strip
+    @school_urn = user[:school_urn].strip
     @organisation_finder = organisation_finder
   end
 
@@ -14,7 +17,7 @@ class CreateDfeSignInUser
       req.body = JSON.generate(sign_in_params)
     end
     if sign_in_response.success?
-      Logger.new($stdout).info("Created DfE Sign-in invitation for #{@user[:email]} for #{@user[:school_urn]}")
+      Logger.new($stdout).info("Created DfE Sign-in invitation for #{email} for #{school_urn}")
       return true
     end
     raise InvitationFailed, sign_in_response.body
@@ -36,21 +39,23 @@ class CreateDfeSignInUser
   def sign_in_params
     {
       sourceId: :user_id_in_your_service,
-      given_name: @user[:given_name],
-      family_name: @user[:family_name],
-      email: @user[:email],
+      given_name: given_name,
+      family_name: family_name,
+      email: email,
       userRedirect: ENV['TEACHING_JOBS_SIGN_IN_URL'],
-      organisation: @organisation_finder.call(school_urn: @user[:school_urn]),
+      organisation: organisation_finder.call(school_urn: school_urn),
       inviteSubjectOverride: email_subject,
       inviteBodyOverride: email_copy
     }
   end
 
-  private def email_subject
+  private
+
+  def email_subject
     "You’ve been invited to join DfE Sign-in by Teaching Jobs"
   end
 
-  private def email_copy
+  def email_copy
     "Teaching Jobs is a free online service for schools in England to list their teaching roles. To use it, schools must first register with DfE Sign-in. Save the following link, which you’ll use to securely access the service once you’ve registered: https://www.gov.uk/guidance/list-a-teaching-role-at-your-school-on-teaching-jobs"
   end
 end
