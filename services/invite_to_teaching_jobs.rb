@@ -36,8 +36,10 @@ class InviteToTeachingJobs
 
     logger.info "#{users.count} user accounts have been associated with #{unique_school_count} schools."
     logger.info "#{unique_users.count} emails were sent."
+  rescue AuthorisationFailed => e
+    log_error("User authorisation in TVA failed: #{e.message}")
   rescue DSI::InvitationFailed => e
-    log_error(e.message)
+    log_error("DSI Invitation failed to be created: #{e.message}")
   end
 
   def user_data_file_name

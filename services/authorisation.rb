@@ -13,12 +13,14 @@ class Authorisation
         school_urn: @user[:school_urn]
       )
     end
-    Logger.new($stdout).info("Preauthorised #{@user[:email]} for #{@user[:school_urn]}")
+    raise AuthorisationFailed, tva_response.body unless tva_response.success?
 
-    raise InvitationFailed, tva_response.body unless tva_response.success?
+    Logger.new($stdout).info("Preauthorised #{@user[:email]} for #{@user[:school_urn]}")
+    tva_response.success?
   end
 
   private def tva_connection
     Faraday.new(ENV['TVA_URL'])
   end
 end
+class AuthorisationFailed < RuntimeError; end
