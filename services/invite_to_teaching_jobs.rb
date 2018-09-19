@@ -4,9 +4,8 @@ require 'pry'
 require 'logger'
 require 'csv'
 
-Dir["./services/*.rb"].each {|file| require file }
+Dir["./services/**/*.rb"].each {|file| require file }
 
-class InvitationFailed < RuntimeError; end
 class InviteToTeachingJobs
 
   def self.run!
@@ -31,12 +30,13 @@ class InviteToTeachingJobs
     end
 
     users.map do |user|
-      CreateDfeSignInUser.new(user: user).call
+      organisation_id = DSI::Organisations.new(school_urn: user[:school_urn]).find
+      DSI::Invitations.new(user: user, organisation_id: organisation_id).call
     end
 
     logger.info "#{users.count} user accounts have been associated with #{unique_school_count} schools."
     logger.info "#{unique_users.count} emails were sent."
-  rescue ::InvitationFailed => e
+  rescue DSI::InvitationFailed => e
     log_error(e.message)
   end
 
