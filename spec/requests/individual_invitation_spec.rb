@@ -10,6 +10,9 @@ RSpec.describe 'Individual invitation' do
     ENV['DFE_SIGN_IN_SERVICE_ID'] = '123456789'
     ENV['TEACHING_JOBS_SIGN_IN_URL'] = '/callback'
     ENV['ENVIRONMENT'] = 'test'
+
+    allow(invite_to_teaching_jobs).to receive(:user_data_file_name)
+      .and_return('./spec/fixtures/individual_test_users.csv')
   end
 
   after(:each) do
@@ -23,14 +26,11 @@ RSpec.describe 'Individual invitation' do
     ENV.delete('ENVIRONMENT')
   end
 
+  let(:invite_to_teaching_jobs) { InviteToTeachingJobs.new }
+
   it 'invites the user' do
-    invite_to_teaching_jobs = InviteToTeachingJobs.new
-
-    allow(invite_to_teaching_jobs).to receive(:user_data_file_name)
-      .and_return('./spec/fixtures/individual_test_users.csv')
-
-    allow_any_instance_of(OrganisationFinder).to receive(:organisation_file_name)
-      .and_return('./spec/fixtures/dsi-test-organisations.csv')
+    allow(DSI::Organisations).to receive_message_chain(:new, :find)
+      .and_return('7FE7B046-3016-4339-A6C7-00267187C523')
 
     user = {
       email: 'test@digital.education.gov.uk',
@@ -94,5 +94,27 @@ RSpec.describe 'Individual invitation' do
 
     WebMock.assert_requested(authorisation_stub)
     WebMock.assert_requested(sign_in_stub)
+  end
+
+  context 'handling errors' do
+    it 'Authorisation failures' do
+      expect(Authorisation).to receive_message_chain(:new, :preauthorise).and_raise AuthorisationFailed, 'message'
+      expect(Logger).to receive_message_chain(:new, :warn)
+        .with('Error creating invitation. Response: User authorisation in TVA failed: message')
+
+      invite_to_teaching_jobs.run
+    end
+
+    it 'DSI::Invitations failures' do
+      expect(Authorisation).to receive_message_chain(:new, :preauthorise)
+      expect(SendEmail).to receive_message_chain(:new, :call)
+      expect(DSI::Organisations).to receive_message_chain(:new, :find)
+      expect(DSI::Invitations).to receive_message_chain(:new, :call).and_raise DSI::InvitationFailed, 'message'
+
+      expect(Logger).to receive_message_chain(:new, :warn)
+        .with('Error creating invitation. Response: DSI Invitation failed to be created: message')
+
+      invite_to_teaching_jobs.run
+    end
   end
 end

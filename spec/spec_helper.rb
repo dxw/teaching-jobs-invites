@@ -102,4 +102,15 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 =end
+  config.before(:each, type: :dsi)  do
+    ENV['DFE_SIGN_IN_API_URL'] = '/dsi-url'
+    ENV['TEACHING_JOBS_SIGN_IN_URL'] = nil
+    allow(JWT).to receive(:encode).and_return(bearer)
+    allow(Logger).to receive_message_chain(:new, :info)
+  end
+
+  config.after(:each, type: :dsi)  do
+    ENV.delete('DFE_SIGN_IN_API_URL')
+    ENV.delete('TEACHING_JOBS_SIGN_IN_URL')
+  end
 end
