@@ -1,5 +1,5 @@
-email,given_name,family_name,school_name,school_urn,trust_name
-email@digital.education.gov.uk   ,Test,Tester   ,Macmillan Academy  ,137138,CPE  
-  email@digital.education.gov.uk,Test,Tester,Macmillan Primary,137139,CPE
-   email@digital.education.gov.uk     ,Test,Tester,Macmillan Secondary,137140,CPE
-   something@digital.education.gov.uk,Test   ,Tester,Other Academy  ,137140,CPE
+email,given_name,family_name,school_name,school_urn,trust_name,other
+email@digital.education.gov.uk   ,Test,Tester   ,Macmillan Academy  ,137138,CPE  ,
+  email@digital.education.gov.uk,Test,Tester,Macmillan Primary,137139,CPE,
+   email@digital.education.gov.uk     ,Test,Tester,Macmillan Secondary,137140,CPE,
+   something@digital.education.gov.uk,Test   ,Tester,Other Academy  ,137140,CPE,
