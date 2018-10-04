@@ -6,7 +6,7 @@ class CsvRowsToUser
     @users = []
     options = { encoding: 'UTF-8', skip_blanks: true, headers: true }
     csv = CSV.open(user_data_file_name, options)
-    [:convert, :header_convert].each { |c| csv.send(c) { |f| f.strip } }
+    [:convert, :header_convert].each { |c| csv.send(c) { |f| f&.strip } }
 
     csv.each do |row|
       @users << row.to_h.transform_keys!(&:to_sym)

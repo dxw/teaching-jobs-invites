@@ -7,10 +7,10 @@ RSpec.describe CsvRowsToUser do
   describe '#users' do
     let(:users) do
       [
-        {email: 'email@digital.education.gov.uk', given_name: 'Test', family_name: 'Tester', school_name: 'Macmillan Academy', school_urn: '137138', trust_name: 'CPE'},
-        {email: 'email@digital.education.gov.uk', given_name: 'Test', family_name: 'Tester', school_name: 'Macmillan Primary', school_urn: '137139', trust_name: 'CPE'},
-        {email: 'email@digital.education.gov.uk', given_name: 'Test', family_name: 'Tester', school_name: 'Macmillan Secondary', school_urn: '137140', trust_name: 'CPE'},
-        {email: 'something@digital.education.gov.uk', given_name: 'Test', family_name: 'Tester', school_name: 'Other Academy', school_urn: '137140', trust_name: 'CPE'},
+        {email: 'email@digital.education.gov.uk', given_name: 'Test', family_name: 'Tester', school_name: 'Macmillan Academy', school_urn: '137138', trust_name: 'CPE', other: nil},
+        {email: 'email@digital.education.gov.uk', given_name: 'Test', family_name: 'Tester', school_name: 'Macmillan Primary', school_urn: '137139', trust_name: 'CPE', other: nil},
+        {email: 'email@digital.education.gov.uk', given_name: 'Test', family_name: 'Tester', school_name: 'Macmillan Secondary', school_urn: '137140', trust_name: 'CPE', other: nil},
+        {email: 'something@digital.education.gov.uk', given_name: 'Test', family_name: 'Tester', school_name: 'Other Academy', school_urn: '137140', trust_name: 'CPE', other: nil},
       ]
     end
 
