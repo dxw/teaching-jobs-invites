@@ -40,6 +40,8 @@ class InviteToTeachingJobs
     log_error("User authorisation in TVA failed: #{e.message}")
   rescue DSI::InvitationFailed => e
     log_error("DSI Invitation failed to be created: #{e.message}")
+  rescue Notifications::Client::RequestError => e
+    log_error("Notify email failed to sent: #{e.message}")
   end
 
   def user_data_file_name
