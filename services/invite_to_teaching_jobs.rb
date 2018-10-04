@@ -2,7 +2,6 @@ require 'faraday'
 require 'notifications/client'
 require 'pry'
 require 'logger'
-require 'csv'
 
 Dir["./services/**/*.rb"].each {|file| require file }
 
@@ -13,18 +12,13 @@ class InviteToTeachingJobs
   end
 
   def run
-    users = []
-    options = { encoding: 'UTF-8', skip_blanks: true, headers: true }
-    CSV.foreach(user_data_file_name, options) do |row|
-      users << row.to_h.transform_keys!(&:to_sym)
-    end
     unique_school_count = users.group_by{|r| r[:school_urn] }.count
 
     users.map do |user|
       Authorisation.new(user).preauthorise
     end
 
-    unique_users = CsvRowsToUser.new(users).transform
+    unique_users = converted_csv.unique_users
     unique_users.map do |user|
       SendEmail.new(user).call
     end
@@ -44,6 +38,14 @@ class InviteToTeachingJobs
 
   def user_data_file_name
     'users.csv'
+  end
+
+  def converted_csv
+    @converted_csv ||= CsvRowsToUser.new(user_data_file_name)
+  end
+
+  def users
+    @user ||= converted_csv.users
   end
 
   private
