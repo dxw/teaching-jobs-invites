@@ -56,6 +56,7 @@ RSpec.describe 'Individual invitation' do
         email_address: user[:email],
         template_id: ENV['NOTIFY_WELCOME_SINGLE_TEMPLATE_ID'],
         personalisation: {
+          email_address: user[:email],
           first_name: user[:given_name],
           family_name: user[:family_name],
           school_name: user[:school_name],

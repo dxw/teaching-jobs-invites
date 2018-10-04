@@ -11,15 +11,18 @@ class SendEmail
     end
   end
 
-  private def notify_client
+  private
+
+  def notify_client
     Notifications::Client.new(ENV['NOTIFY_KEY'])
   end
 
-  private def send_single_welcome_email
+  def send_single_welcome_email
     notify_client.send_email(
       email_address: @user[:email],
       template_id: ENV['NOTIFY_WELCOME_SINGLE_TEMPLATE_ID'],
       personalisation: {
+        email_address: @user[:email],
         first_name: @user[:given_name],
         family_name: @user[:family_name],
         school_name: @user[:schools].first[:school_name]
@@ -29,11 +32,12 @@ class SendEmail
     Logger.new($stdout).info("Sent welcome email to #{@user[:email]} for #{@user[:schools].first[:school_name]}")
   end
 
-  private def send_trust_welcome_email
+  def send_trust_welcome_email
     notify_client.send_email(
       email_address: @user[:email],
       template_id: ENV['NOTIFY_WELCOME_TRUST_TEMPLATE_ID'],
       personalisation: {
+        email_address: @user[:email],
         first_name: @user[:given_name],
         family_name: @user[:family_name],
         school_name: "#{@user[:schools].count} schools",

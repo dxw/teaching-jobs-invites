@@ -74,6 +74,7 @@ RSpec.describe 'Multiple invitations' do
           email_address: first_row[:email],
           template_id: ENV['NOTIFY_WELCOME_TRUST_TEMPLATE_ID'],
           personalisation: {
+            email_address: first_row[:email],
             first_name: first_row[:given_name],
             family_name: first_row[:family_name],
             school_name: '2 schools',
