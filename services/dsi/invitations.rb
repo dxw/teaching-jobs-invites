@@ -42,11 +42,11 @@ module DSI
     end
 
     def email_subject
-      "You’ve been invited to join DfE Sign-in by Teaching Jobs"
+      "You’ve been invited to join DfE Sign-in by Teaching Vacancies"
     end
 
     def email_copy
-      "Teaching Jobs is a free online service for schools in England to list their teaching roles. To use it, schools must first register with DfE Sign-in. Save the following link, which you’ll use to securely access the service once you’ve registered: https://www.gov.uk/guidance/list-a-teaching-role-at-your-school-on-teaching-jobs"
+      "Teaching Vacancies is a free online service for schools in England to list their teaching roles. To use it, schools must first register with DfE Sign-in. Save the following link, which you’ll use to securely access the service once you’ve registered: https://www.gov.uk/guidance/list-a-teaching-job-at-your-school-on-teaching-vacancies"
     end
   end
 

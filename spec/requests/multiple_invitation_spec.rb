@@ -89,8 +89,8 @@ RSpec.describe 'Multiple invitations' do
                                      email: first_row[:email],
                                      userRedirect: '/callback',
                                      organisation: 'E552F3B4-4C1C-43B1-A2BC-000040C04C60',
-                                     inviteSubjectOverride: "You’ve been invited to join DfE Sign-in by Teaching Jobs",
-                                     inviteBodyOverride: "Teaching Jobs is a free online service for schools in England to list their teaching roles. To use it, schools must first register with DfE Sign-in. Save the following link, which you’ll use to securely access the service once you’ve registered: https://www.gov.uk/guidance/list-a-teaching-role-at-your-school-on-teaching-jobs"
+                                     inviteSubjectOverride: "You’ve been invited to join DfE Sign-in by Teaching Vacancies",
+                                     inviteBodyOverride: "Teaching Vacancies is a free online service for schools in England to list their teaching roles. To use it, schools must first register with DfE Sign-in. Save the following link, which you’ll use to securely access the service once you’ve registered: https://www.gov.uk/guidance/list-a-teaching-job-at-your-school-on-teaching-vacancies"
                                    )
       first_sign_in_stub = WebMock.stub_request(:post, 'https://sign-in.com/services/123456789/invitations')
                                   .with(body: first_sign_in_payload)
@@ -102,8 +102,8 @@ RSpec.describe 'Multiple invitations' do
                                       email: first_row[:email],
                                       userRedirect: '/callback',
                                       organisation: '5BE7D1AE-D281-4DF1-8F93-0001BE69E525',
-                                      inviteSubjectOverride: "You’ve been invited to join DfE Sign-in by Teaching Jobs",
-                                      inviteBodyOverride: "Teaching Jobs is a free online service for schools in England to list their teaching roles. To use it, schools must first register with DfE Sign-in. Save the following link, which you’ll use to securely access the service once you’ve registered: https://www.gov.uk/guidance/list-a-teaching-role-at-your-school-on-teaching-jobs"
+                                      inviteSubjectOverride: "You’ve been invited to join DfE Sign-in by Teaching Vacancies",
+                                      inviteBodyOverride: "Teaching Vacancies is a free online service for schools in England to list their teaching roles. To use it, schools must first register with DfE Sign-in. Save the following link, which you’ll use to securely access the service once you’ve registered: https://www.gov.uk/guidance/list-a-teaching-job-at-your-school-on-teaching-vacancies"
                                     )
       second_sign_in_stub = WebMock.stub_request(:post, 'https://sign-in.com/services/123456789/invitations')
                                    .with(body: second_sign_in_payload)
