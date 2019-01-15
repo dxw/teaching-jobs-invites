@@ -31,11 +31,11 @@ class InviteToTeachingJobs
     logger.info "#{users.count} user accounts have been associated with #{unique_school_count} schools."
     logger.info "#{unique_users.count} emails were sent."
   rescue AuthorisationFailed => e
-    log_error("User authorisation in TVA failed: #{e.message}")
+    log_error(e)
   rescue DSI::InvitationFailed => e
-    log_error("DSI Invitation failed to be created: #{e.message}")
+    log_error(e)
   rescue Notifications::Client::RequestError => e
-    log_error("Notify email failed to sent: #{e.message}")
+    log_error(e)
   end
 
   def user_data_file_name
@@ -52,8 +52,17 @@ class InviteToTeachingJobs
 
   private
 
-  def log_error(response_body)
+  def log_error(error)
+    response_body = "#{error_messages[error.class]}: #{error.message}"
     logger.warn("Error creating invitation. Response: #{response_body}")
+  end
+
+  def error_messages
+    {
+      AuthorisationFailed => 'User authorisation in TVA failed',
+      DSI::InvitationFailed => 'DSI Invitation failed to be created',
+      Notifications::Client::RequestError => 'Notify email failed to sent'
+    }
   end
 
   def logger
