@@ -13,7 +13,7 @@ class InviteToTeachingJobs
 
   def run
     unique_school_count = users.group_by{|r| r[:school_urn] }.count
-    failed_users = []
+    failed_users = FailedUsers.new
 
     users.map do |user|
       Authorisation.new(user).preauthorise
@@ -44,7 +44,11 @@ class InviteToTeachingJobs
 
     logger.info "#{users.count} user accounts have been associated with #{unique_school_count} schools."
     logger.info "#{unique_users.count} emails were sent."
-    logger.info "#{failed_users.count} users had errors associated." if failed_users.count.positive?
+    
+    return unless failed_users.count.positive?
+
+    failed_users.log_csv
+    logger.info "#{failed_users.count} users had errors associated. See failed-users.csv for details"
   end
 
   def user_data_file_name

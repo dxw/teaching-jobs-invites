@@ -98,32 +98,63 @@ RSpec.describe 'Individual invitation' do
   end
 
   context 'handling errors' do
-    it 'Authorisation failures' do
-      expect(Authorisation).to receive_message_chain(:new, :preauthorise).and_raise AuthorisationFailed, 'message'
-      expect(Logger).to receive_message_chain(:new, :warn)
-        .with('Error creating invitation. Response: User authorisation in TVA failed: message')
-        
-      3.times do
-        expect(Logger).to receive_message_chain(:new, :info)
+    after { File.delete('failed-users.csv') }
+
+    context 'Authorisation failures' do
+      before do
+        expect(Authorisation).to receive_message_chain(:new, :preauthorise).and_raise AuthorisationFailed, 'message'
       end
 
-      invite_to_teaching_jobs.run
+      it 'raises errors' do
+        expect(Logger).to receive_message_chain(:new, :warn)
+          .with('Error creating invitation. Response: User authorisation in TVA failed: message')
+
+        3.times do
+          expect(Logger).to receive_message_chain(:new, :info)
+        end
+
+        invite_to_teaching_jobs.run
+      end
+
+      it 'generates a csv' do
+        allow(Logger).to receive_message_chain(:new, :warn)
+        allow(Logger).to receive_message_chain(:new, :info)
+
+        invite_to_teaching_jobs.run
+
+        expect(File).to exist('failed-users.csv')
+        expect(CSV.read('failed-users.csv')).to eq(CSV.read('./spec/fixtures/individual_test_users.csv'))
+      end
     end
 
-    it 'DSI::Invitations failures' do
-      expect(Authorisation).to receive_message_chain(:new, :preauthorise)
-      expect(SendEmail).to receive_message_chain(:new, :call)
-      expect(DSI::Organisations).to receive_message_chain(:new, :find)
-      expect(DSI::Invitations).to receive_message_chain(:new, :call).and_raise DSI::InvitationFailed, 'message'
-
-      expect(Logger).to receive_message_chain(:new, :warn)
-        .with('Error creating invitation. Response: DSI Invitation failed to be created: message')
-
-      3.times do
-        expect(Logger).to receive_message_chain(:new, :info)
+    context 'DSI::Invitations failures' do
+      before do
+        expect(Authorisation).to receive_message_chain(:new, :preauthorise)
+        expect(SendEmail).to receive_message_chain(:new, :call)
+        expect(DSI::Organisations).to receive_message_chain(:new, :find)
+        expect(DSI::Invitations).to receive_message_chain(:new, :call).and_raise DSI::InvitationFailed, 'message'
       end
 
-      invite_to_teaching_jobs.run
+      it 'raises errors' do
+        expect(Logger).to receive_message_chain(:new, :warn)
+         .with('Error creating invitation. Response: DSI Invitation failed to be created: message')
+
+        3.times do
+         expect(Logger).to receive_message_chain(:new, :info)
+        end
+
+        invite_to_teaching_jobs.run
+      end
+
+      it 'generates a csv' do
+        allow(Logger).to receive_message_chain(:new, :warn)
+        allow(Logger).to receive_message_chain(:new, :info)
+
+        invite_to_teaching_jobs.run
+
+        expect(File).to exist('failed-users.csv')
+        expect(CSV.read('failed-users.csv')).to eq(CSV.read('./spec/fixtures/individual_test_users.csv'))
+      end
     end
   end
 end

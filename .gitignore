@@ -2,3 +2,4 @@
 .bundle
 users.csv
 .prodenv
+/failed-users.csv
