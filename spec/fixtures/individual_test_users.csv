@@ -1,2 +1,2 @@
-email,given_name,family_name,school_name,school_urn
-test@digital.education.gov.uk,Test,Tester,Crown Wood Primary School,144048
+school_urn,given_name,family_name,email,school_name,trust_name
+144048,Test,Tester,test@digital.education.gov.uk,Crown Wood Primary School,
