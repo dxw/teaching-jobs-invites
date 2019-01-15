@@ -1,2 +1,2 @@
-email,given_name,family_name,school_name,school_urn,trust_name
-test@digital.education.gov.uk,Test,Tester,Macmillan Academy,137138
+school_urn,given_name,family_name,email,school_name,trust_name
+137138,Test,Tester,test@digital.education.gov.uk,Macmillan Academy,
