@@ -13,11 +13,13 @@ class InviteToTeachingJobs
 
   def run
     unique_school_count = users.group_by{|r| r[:school_urn] }.count
+    failed_users = []
 
     users.map do |user|
       Authorisation.new(user).preauthorise
     rescue => e
       log_error(e)
+      failed_users << user
       converted_csv.remove_user(user)
       next
     end
@@ -26,6 +28,7 @@ class InviteToTeachingJobs
     unique_users.map do |user|
       SendEmail.new(user).call
     rescue Notifications::Client::RequestError => e
+      failed_users << user
       log_error(e)
       next
     end
@@ -34,12 +37,14 @@ class InviteToTeachingJobs
       organisation_id = DSI::Organisations.new(school_urn: user[:school_urn]).find
       DSI::Invitations.new(user: user, organisation_id: organisation_id).call
     rescue DSI::InvitationFailed => e
+      failed_users << user
       log_error(e)
       next
     end
 
     logger.info "#{users.count} user accounts have been associated with #{unique_school_count} schools."
     logger.info "#{unique_users.count} emails were sent."
+    logger.info "#{failed_users.count} users had errors associated." if failed_users.count.positive?
   end
 
   def user_data_file_name
