@@ -16,26 +16,30 @@ class InviteToTeachingJobs
 
     users.map do |user|
       Authorisation.new(user).preauthorise
+    rescue => e
+      log_error(e)
+      converted_csv.remove_user(user)
+      next
     end
 
     unique_users = converted_csv.unique_users
     unique_users.map do |user|
       SendEmail.new(user).call
+    rescue Notifications::Client::RequestError => e
+      log_error(e)
+      next
     end
 
     users.map do |user|
       organisation_id = DSI::Organisations.new(school_urn: user[:school_urn]).find
       DSI::Invitations.new(user: user, organisation_id: organisation_id).call
+    rescue DSI::InvitationFailed => e
+      log_error(e)
+      next
     end
 
     logger.info "#{users.count} user accounts have been associated with #{unique_school_count} schools."
     logger.info "#{unique_users.count} emails were sent."
-  rescue AuthorisationFailed => e
-    log_error(e)
-  rescue DSI::InvitationFailed => e
-    log_error(e)
-  rescue Notifications::Client::RequestError => e
-    log_error(e)
   end
 
   def user_data_file_name

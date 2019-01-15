@@ -17,6 +17,10 @@ class CsvRowsToUser
     @users
   end
 
+  def remove_user(user)
+    @users.reject! { |u| user == u }
+  end
+
   def unique_users
     @users.group_by{|row| row[:email] }.map do |rows|
       rows_belonging_to_user = rows[1]
