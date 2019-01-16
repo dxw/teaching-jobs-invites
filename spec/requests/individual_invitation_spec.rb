@@ -98,6 +98,9 @@ RSpec.describe 'Individual invitation' do
   end
 
   context 'handling errors' do
+    let(:logger) { instance_double(Logger, warn: nil, info: nil) }
+
+    before { allow(Logger).to receive(:new) { logger } }
     after { File.delete('failed-users.csv') }
 
     context 'Authorisation failures' do
@@ -106,20 +109,13 @@ RSpec.describe 'Individual invitation' do
       end
 
       it 'raises errors' do
-        expect(Logger).to receive_message_chain(:new, :warn)
+        expect(logger).to receive(:warn)
           .with('Error creating invitation. Response: User authorisation in TVA failed: message')
-
-        3.times do
-          expect(Logger).to receive_message_chain(:new, :info)
-        end
 
         invite_to_teaching_jobs.run
       end
 
       it 'generates a csv' do
-        allow(Logger).to receive_message_chain(:new, :warn)
-        allow(Logger).to receive_message_chain(:new, :info)
-
         invite_to_teaching_jobs.run
 
         expect(File).to exist('failed-users.csv')
@@ -136,20 +132,13 @@ RSpec.describe 'Individual invitation' do
       end
 
       it 'raises errors' do
-        expect(Logger).to receive_message_chain(:new, :warn)
-         .with('Error creating invitation. Response: DSI Invitation failed to be created: message')
-
-        3.times do
-         expect(Logger).to receive_message_chain(:new, :info)
-        end
+        expect(logger).to receive(:warn)
+          .with('Error creating invitation. Response: DSI Invitation failed to be created: message')
 
         invite_to_teaching_jobs.run
       end
 
       it 'generates a csv' do
-        allow(Logger).to receive_message_chain(:new, :warn)
-        allow(Logger).to receive_message_chain(:new, :info)
-
         invite_to_teaching_jobs.run
 
         expect(File).to exist('failed-users.csv')
