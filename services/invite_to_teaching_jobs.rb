@@ -48,7 +48,7 @@ class InviteToTeachingJobs
     return unless failed_users.count.positive?
 
     failed_users.log_csv
-    logger.info "#{failed_users.count} users had errors associated. See failed-users.csv for details"
+    logger.info "#{failed_users.count} user(s) had errors associated. See failed-users.csv for details"
   end
 
   def user_data_file_name

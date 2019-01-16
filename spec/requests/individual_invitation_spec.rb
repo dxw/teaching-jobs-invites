@@ -108,9 +108,11 @@ RSpec.describe 'Individual invitation' do
         expect(Authorisation).to receive_message_chain(:new, :preauthorise).and_raise AuthorisationFailed, 'message'
       end
 
-      it 'raises errors' do
+      it 'logs errors' do
         expect(logger).to receive(:warn)
           .with('Error creating invitation. Response: User authorisation in TVA failed: message')
+        expect(logger).to receive(:info)
+          .with('1 user(s) had errors associated. See failed-users.csv for details')
 
         invite_to_teaching_jobs.run
       end
@@ -131,9 +133,11 @@ RSpec.describe 'Individual invitation' do
         expect(DSI::Invitations).to receive_message_chain(:new, :call).and_raise DSI::InvitationFailed, 'message'
       end
 
-      it 'raises errors' do
+      it 'logs errors' do
         expect(logger).to receive(:warn)
           .with('Error creating invitation. Response: DSI Invitation failed to be created: message')
+        expect(logger).to receive(:info)
+          .with('1 user(s) had errors associated. See failed-users.csv for details')
 
         invite_to_teaching_jobs.run
       end
