@@ -1,20 +1,38 @@
 require 'csv'
+
 class CsvRowsToUser
+  attr_reader :users
+  attr_reader :errors
+
   SCHOOL_COLUMNS = [:school_urn, :school_name]
 
   def initialize(user_data_file_name)
     @users = []
+    @errors = []
     options = { encoding: 'UTF-8', skip_blanks: true, headers: true }
     csv = CSV.open(user_data_file_name, options)
     [:convert, :header_convert].each { |c| csv.send(c) { |f| f&.strip } }
 
-    csv.each do |row|
-      @users << row.to_h.transform_keys!(&:to_sym)
+    csv.each_with_index do |row, index|
+      @users << row_to_user(row, index + 1)
     end
   end
 
-  def users
-    @users
+  def row_to_user(row, row_number)
+    user = row.to_h.transform_keys!(&:to_sym)
+    validate_user(user, row_number)    
+    user
+  end
+
+  def validate_user(user, row_number)
+    [:email, :given_name, :family_name, :school_name].each do |col|    
+      @errors << "Missing #{col} at row #{row_number}" if !user[col] || user[col].empty?
+    end
+    @errors << "Invalid email at row #{row_number}" if email_invalid?(user[:email])
+  end
+
+  def email_invalid?(email)
+    !email.nil? && !email.match(URI::MailTo::EMAIL_REGEXP)
   end
 
   def unique_users

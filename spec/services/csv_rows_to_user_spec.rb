@@ -41,4 +41,62 @@ RSpec.describe CsvRowsToUser do
       ])
     end
   end
+
+  context 'invalid data' do
+    let(:errors) { csv_rows_to_user.errors }
+
+    context 'with a missing email' do
+      let(:csv_file) { "./spec/fixtures/missing_email.csv" }
+
+      it 'returns an error' do
+        expect(errors.count).to eq(1)
+        expect(errors.first).to eq('Missing email at row 1')
+      end
+    end
+
+    context 'with a missing first name' do
+      let(:csv_file) { "./spec/fixtures/missing_first_name.csv" }
+
+      it 'returns an error' do
+        expect(errors.count).to eq(1)
+        expect(errors.first).to eq('Missing given_name at row 1')
+      end
+    end
+
+    context 'with a missing last name' do
+      let(:csv_file) { "./spec/fixtures/missing_last_name.csv" }
+
+      it 'returns an error' do
+        expect(errors.count).to eq(1)
+        expect(errors.first).to eq('Missing family_name at row 1')
+      end
+    end
+
+    context 'with a missing school' do
+      let(:csv_file) { "./spec/fixtures/missing_school.csv" }
+
+      it 'returns an error' do
+        expect(errors.count).to eq(1)
+        expect(errors.first).to eq('Missing school_name at row 1')
+      end
+    end
+
+    context 'with an invalid email' do
+      let(:csv_file) { "./spec/fixtures/invalid_email.csv" }
+
+      it 'returns an error' do
+        expect(errors.count).to eq(1)
+        expect(errors.first).to eq('Invalid email at row 1')
+      end
+    end
+
+    context 'with multiple rows' do
+      let(:csv_file) { "./spec/fixtures/multiple_errors.csv" }
+
+      it 'returns errors' do
+        expect(errors.count).to eq(3)
+      end
+    end
+  end
+
 end

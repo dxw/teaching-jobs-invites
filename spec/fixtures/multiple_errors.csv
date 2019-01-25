@@ -1,0 +1,5 @@
+email,given_name,family_name,school_name,school_urn
+test@digital.education.gov.uk,Test,Tester,Crown Wood Primary School,144048
+"NOT_AN_EMAIL!@foo,com",Test,Tester,Crown Wood Primary School,144048
+test@digital.education.gov.uk,Test,Tester,,144048
+test@digital.education.gov.uk,Test,,Crown Wood Primary School,144048
