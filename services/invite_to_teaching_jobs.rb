@@ -12,20 +12,21 @@ class InviteToTeachingJobs
   end
 
   def run
-    @converted_csv = CsvRowsToUser.new(user_data_file_name)
+    converted_csv = CsvRowsToUser.new(user_data_file_name)
 
-    if @converted_csv.errors.count > 0
-      log_parsing_errors
+    if converted_csv.errors.count > 0
+      log_parsing_errors(csv: converted_csv)
     else
-      @users = @converted_csv.users
-      unique_school_count = @users.group_by{|r| r[:school_urn] }.count
+      users = converted_csv.users
+      unique_users = converted_csv.unique_users
+      unique_school_count = users.group_by{|r| r[:school_urn] }.count
 
-      preauthorise_users
-      send_invitations
-      setup_accounts
+      preauthorise_users(users: users)
+      send_invitations(users: unique_users)
+      setup_accounts(users: users)
 
-      logger.info "#{@users.count} user accounts have been associated with #{unique_school_count} schools."
-      logger.info "#{@unique_users.count} emails were sent."
+      logger.info "#{users.count} user accounts have been associated with #{unique_school_count} schools."
+      logger.info "#{unique_users.count} emails were sent."
     end
   rescue AuthorisationFailed => e
     log_error("User authorisation in TVA failed: #{e.message}")
@@ -39,22 +40,21 @@ class InviteToTeachingJobs
     'users.csv'
   end
 
-  def setup_accounts
-    @users.map do |user|
+  def setup_accounts(users:)
+    users.map do |user|
       organisation_id = DSI::Organisations.new(school_urn: user[:school_urn]).find
       DSI::Invitations.new(user: user, organisation_id: organisation_id).call
     end
   end
 
-  def send_invitations
-    @unique_users = @converted_csv.unique_users
-    @unique_users.map do |user|
+  def send_invitations(users:)
+    users.map do |user|
       SendEmail.new(user).call
     end
   end
 
-  def preauthorise_users
-    @users.map do |user|
+  def preauthorise_users(users:)
+    users.map do |user|
       Authorisation.new(user).preauthorise
     end
   end
@@ -69,8 +69,8 @@ class InviteToTeachingJobs
     @logger ||= Logger.new($stdout)
   end
 
-  def log_parsing_errors
-    @converted_csv.errors.each do |error|
+  def log_parsing_errors(csv:)
+    csv.errors.each do |error|
       logger.error(error)
     end
   end
