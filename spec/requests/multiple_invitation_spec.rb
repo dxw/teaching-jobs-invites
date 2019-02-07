@@ -21,9 +21,10 @@ RSpec.describe 'Multiple invitations' do
     ENV.delete('TEACHING_JOBS_SIGN_IN_URL')
   end
 
+  let(:invite_to_teaching_jobs) { InviteToTeachingJobs.new }
+
   context 'when the email address is the same' do
     it 'invites the user' do
-      invite_to_teaching_jobs = InviteToTeachingJobs.new
 
       allow(invite_to_teaching_jobs).to receive(:user_data_file_name)
         .and_return('./spec/fixtures/multiple_test_users.csv')
@@ -132,6 +133,28 @@ RSpec.describe 'Multiple invitations' do
       WebMock.assert_requested(second_authorisation_stub)
       WebMock.assert_requested(first_sign_in_stub)
       WebMock.assert_requested(second_sign_in_stub)
+    end
+  end
+
+  context 'when the CSV is invalid' do
+    before do
+      allow(invite_to_teaching_jobs).to receive(:user_data_file_name)
+        .and_return('./spec/fixtures/multiple_errors.csv')
+    end
+
+    it 'does not run the invitation process' do
+      expect(Logger).to receive_message_chain(:new, :error)
+        .with('Invalid email at row 2')
+      expect(Logger).to receive_message_chain(:new, :error)
+        .with('Missing school_name at row 3')
+      expect(Logger).to receive_message_chain(:new, :error)
+        .with('Missing family_name at row 4')
+
+      expect(invite_to_teaching_jobs).to_not receive(:preauthorise_users)
+      expect(invite_to_teaching_jobs).to_not receive(:send_invitations)
+      expect(invite_to_teaching_jobs).to_not receive(:setup_accounts)
+
+      invite_to_teaching_jobs.run
     end
   end
 end

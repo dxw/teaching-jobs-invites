@@ -12,24 +12,22 @@ class InviteToTeachingJobs
   end
 
   def run
-    unique_school_count = users.group_by{|r| r[:school_urn] }.count
+    converted_csv = CsvRowsToUser.new(user_data_file_name)
 
-    users.map do |user|
-      Authorisation.new(user).preauthorise
+    if converted_csv.errors.count > 0
+      log_parsing_errors(csv: converted_csv)
+    else
+      users = converted_csv.users
+      unique_users = converted_csv.unique_users
+      unique_school_count = users.group_by{|r| r[:school_urn] }.count
+
+      preauthorise_users(users: users)
+      send_invitations(users: unique_users)
+      setup_accounts(users: users)
+
+      logger.info "#{users.count} user accounts have been associated with #{unique_school_count} schools."
+      logger.info "#{unique_users.count} emails were sent."
     end
-
-    unique_users = converted_csv.unique_users
-    unique_users.map do |user|
-      SendEmail.new(user).call
-    end
-
-    users.map do |user|
-      organisation_id = DSI::Organisations.new(school_urn: user[:school_urn]).find
-      DSI::Invitations.new(user: user, organisation_id: organisation_id).call
-    end
-
-    logger.info "#{users.count} user accounts have been associated with #{unique_school_count} schools."
-    logger.info "#{unique_users.count} emails were sent."
   rescue AuthorisationFailed => e
     log_error("User authorisation in TVA failed: #{e.message}")
   rescue DSI::InvitationFailed => e
@@ -42,12 +40,23 @@ class InviteToTeachingJobs
     'users.csv'
   end
 
-  def converted_csv
-    @converted_csv ||= CsvRowsToUser.new(user_data_file_name)
+  def setup_accounts(users:)
+    users.map do |user|
+      organisation_id = DSI::Organisations.new(school_urn: user[:school_urn]).find
+      DSI::Invitations.new(user: user, organisation_id: organisation_id).call
+    end
   end
 
-  def users
-    @user ||= converted_csv.users
+  def send_invitations(users:)
+    users.map do |user|
+      SendEmail.new(user).call
+    end
+  end
+
+  def preauthorise_users(users:)
+    users.map do |user|
+      Authorisation.new(user).preauthorise
+    end
   end
 
   private
@@ -58,5 +67,11 @@ class InviteToTeachingJobs
 
   def logger
     @logger ||= Logger.new($stdout)
+  end
+
+  def log_parsing_errors(csv:)
+    csv.errors.each do |error|
+      logger.error(error)
+    end
   end
 end

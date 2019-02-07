@@ -117,5 +117,22 @@ RSpec.describe 'Individual invitation' do
 
       invite_to_teaching_jobs.run
     end
+
+    context 'when the CSV is invalid' do
+      before do
+        allow(invite_to_teaching_jobs).to receive(:user_data_file_name)
+          .and_return('./spec/fixtures/missing_email.csv')
+      end
+
+      it 'does not run the invitation process' do
+        expect(Logger).to receive_message_chain(:new, :error)
+          .with('Missing email at row 1')
+        expect(invite_to_teaching_jobs).to_not receive(:preauthorise_users)
+        expect(invite_to_teaching_jobs).to_not receive(:send_invitations)
+        expect(invite_to_teaching_jobs).to_not receive(:setup_accounts)
+
+        invite_to_teaching_jobs.run
+      end
+    end
   end
 end
